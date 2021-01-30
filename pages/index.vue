@@ -2,33 +2,35 @@
   <div class="container">
     <div>
       <Logo />
-      <h1 class="title">NuxtVercelTest</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+      <h1 class="title">vercel-nuxt-example</h1>
+      <ul>
+        <li v-for="content in contents">{{ content.slice(0, 100) }}</li>
+      </ul>
+
+      <pre>
+        {{ time }}
+        {{ server }}
+      </pre>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-
-export default Vue.extend({})
+export default Vue.extend({
+  asyncData() {
+    return { time: Date.now(), server: process.server }
+  },
+  data: () => ({ contents: [] as string[] }),
+  async mounted() {
+    this.contents = await Promise.all([
+      fetch('/api/hello').then((res) => res.text()),
+      fetch('/api/hello.ts').then((res) => res.text()),
+      fetch('/api/contents/[id].ts').then((res) => res.text()),
+      fetch('/api/contents/haha').then((res) => res.text()),
+    ])
+  },
+})
 </script>
 
 <style>
